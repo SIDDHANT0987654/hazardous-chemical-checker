@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hazardous Chemical Interactions</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f4f7fc;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            color: #333;
+        }
+        h1 {
+            font-size: 3rem;
+            text-align: center;
+            color: #4CAF50;
+            margin-bottom: 40px;
+        }
+        input[type="text"] {
+            width: 50%;
+            padding: 15px;
+            margin-bottom: 20px;
+            border: 2px solid #4CAF50;
+            border-radius: 30px;
+            font-size: 1.2rem;
+            outline: none;
+            box-sizing: border-box;
+            transition: all 0.3s ease;
+        }
+        input[type="text"]:focus {
+            border-color: #45a049;
+            box-shadow: 0 0 8px rgba(72, 198, 118, 0.4);
+        }
+        button {
+            padding: 15px 30px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 30px;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        #searchResults {
+            margin-top: 30px;
+            width: 60%;
+            padding: 20px;
+            border-radius: 8px;
+            background-color: #fff;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            color: #333;
+            display: none;
+        }
+        ul {
+            list-style-type: none;
+            padding-left: 0;
+        }
+        ul li {
+            margin: 10px 0;
+            line-height: 1.5;
+        }
+        .result-heading {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #4CAF50;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Hazardous Chemical Interaction Checker</h1>
+    
+    <!-- Search bar -->
+    <input type="text" id="searchInput" placeholder="Enter chemical name">
+
+    <!-- Search button -->
+    <button id="searchButton" onclick="searchChemical()">Check Interaction</button>
+
+    <!-- Search results will appear here -->
+    <div id="searchResults"></div>
+
+    <script>
+        // Data for hazardous chemicals
+        const chemicalsData = {
+            "Sodium Hydroxide": {
+                hazards: {
+                    "Avoid with": [
+                        { chemical: "Acids", hazard: "Violent neutralization reaction producing heat and splattering." },
+                        { chemical: "Water (in large amounts)", hazard: "Exothermic reaction causing splashing and burns." }
+                    ],
+                    "Precautions": [
+                        "Store in tightly sealed containers to avoid moisture absorption.",
+                        "Use gloves, goggles, and a face shield while handling.",
+                        "Always add sodium hydroxide to water, not water to sodium hydroxide."
+                    ]
+                }
+            },
+            "Hydrochloric Acid": {
+                hazards: {
+                    "Avoid with": [
+                        { chemical: "Ammonia", hazard: "Produces toxic fumes of ammonium chloride." },
+                        { chemical: "Oxidizers", hazard: "May release chlorine gas, causing respiratory issues." }
+                    ],
+                    "Precautions": [
+                        "Handle in a well-ventilated area.",
+                        "Wear acid-resistant gloves and goggles.",
+                        "Store in corrosion-resistant containers."
+                    ]
+                }
+            },
+            "Sulfuric Acid": {
+                hazards: {
+                    "Avoid with": [
+                        { chemical: "Water", hazard: "Exothermic reaction causing splattering and burns." },
+                        { chemical: "Organic materials", hazard: "Can cause combustion or explosions." }
+                    ],
+                    "Precautions": [
+                        "Add acid to water, not water to acid.",
+                        "Use gloves, goggles, and a face shield.",
+                        "Store in a cool, dry place."
+                    ]
+                }
+            },
+            "Ammonia": {
+                hazards: {
+                    "Avoid with": [
+                        { chemical: "Chlorine", hazard: "Produces toxic chloramine gas." },
+                        { chemical: "Acids", hazard: "Releases ammonia gas, which is harmful to inhale." }
+                    ],
+                    "Precautions": [
+                        "Use in a well-ventilated area.",
+                        "Avoid mixing with cleaning products containing chlorine.",
+                        "Wear gloves and goggles."
+                    ]
+                }
+            },
+            "Ethanol": {
+                hazards: {
+                    "Avoid with": [
+                        { chemical: "Strong oxidizers", hazard: "Can lead to fire or explosions." },
+                        { chemical: "Potassium permanganate", hazard: "Highly reactive, leading to combustion." }
+                    ],
+                    "Precautions": [
+                        "Store in a cool, dry place away from heat sources.",
+                        "Handle in a well-ventilated area.",
+                        "Keep away from open flames."
+                    ]
+                }
+            },
+            "Acetone": {
+                hazards: {
+                    "Avoid with": [
+                        { chemical: "Strong oxidizers", hazard: "May cause fire or explosions." },
+                        { chemical: "Acids", hazard: "Can produce harmful byproducts." }
+                    ],
+                    "Precautions": [
+                        "Store in tightly closed containers away from heat.",
+                        "Use in a well-ventilated area.",
+                        "Wear gloves and goggles."
+                    ]
+                }
+            },
+            "Benzene": {
+                hazards: {
+                    "Avoid with": [
+                        { chemical: "Oxidizers", hazard: "May cause combustion or explosion." },
+                        { chemical: "Chlorine", hazard: "Forms toxic chlorinated byproducts." }
+                    ],
+                    "Precautions": [
+                        "Store in a cool, dry place away from sunlight.",
+                        "Handle in a well-ventilated area.",
+                        "Avoid inhalation and prolonged skin contact."
+                    ]
+                }
+            },
+            "Chlorine": {
+                hazards: {
+                    "Avoid with": [
+                        { chemical: "Ammonia", hazard: "Produces toxic chloramine gas." },
+                        { chemical: "Hydrocarbons", hazard: "Highly reactive, leading to combustion." }
+                    ],
+                    "Precautions": [
+                        "Store in corrosion-resistant containers.",
+                        "Handle with gloves and goggles.",
+                        "Use in a well-ventilated area."
+                    ]
+                }
+            },
+            "Potassium Permanganate": {
+                hazards: {
+                    "Avoid with": [
+                        { chemical: "Glycerin", hazard: "Causes explosive reactions." },
+                        { chemical: "Alcohols", hazard: "Highly reactive, leading to combustion." }
+                    ],
+                    "Precautions": [
+                        "Store in a dry place away from organic materials.",
+                        "Avoid mixing with flammable substances.",
+                        "Wear protective gloves and goggles."
+                    ]
+                }
+            },
+            "Diethyl Ether": {
+                hazards: {
+                    "Avoid with": [
+                        { chemical: "Strong oxidizers", hazard: "Can lead to fire or explosions." },
+                        { chemical: "Air (prolonged exposure)", hazard: "Forms explosive peroxides." }
+                    ],
+                    "Precautions": [
+                        "Store in airtight containers in a cool place.",
+                        "Keep away from open flames and heat.",
+                        "Avoid prolonged exposure to air."
+                    ]
+                }
+            }
+        };
+
+        // Function to search chemicals and display hazardous interactions
+        function searchChemical() {
+            const searchInput = document.getElementById("searchInput").value.trim().toLowerCase();
+            const resultsDiv = document.getElementById("searchResults");
+            resultsDiv.style.display = 'none'; // Hide results initially
+            resultsDiv.innerHTML = ''; // Clear previous results
+
+            if (searchInput) {
+                let foundChemical = false;
+
+                // Iterate through the chemicalsData
+                for (const chemical in chemicalsData) {
+                    if (chemical.toLowerCase() === searchInput) {
+                        foundChemical = true;
+                        const data = chemicalsData[chemical];
+                        const hazardDetails = data.hazards;
+
+                        // Display the chemical name
+                        resultsDiv.innerHTML += `<h2 class="result-heading">${chemical}</h2>`;
+
+                        // Display "Avoid with" chemicals and hazards
+                        if (hazardDetails["Avoid with"]) {
+                            resultsDiv.innerHTML += '<strong>Avoid using with:</strong><ul>';
+                            hazardDetails["Avoid with"].forEach(item => {
+                                resultsDiv.innerHTML += `<li><strong>${item.chemical}:</strong> ${item.hazard}</li>`;
+                            });
+                            resultsDiv.innerHTML += '</ul>';
+                        }
+
+                        // Display precautions
+                        if (hazardDetails["Precautions"]) {
+                            resultsDiv.innerHTML += '<strong>Precautions:</strong><ul>';
+                            hazardDetails["Precautions"].forEach(precaution => {
+                                resultsDiv.innerHTML += `<li>${precaution}</li>`;
+                            });
+                            resultsDiv.innerHTML += '</ul>';
+                        }
+                        break;
+                    }
+                }
+
+                if (!foundChemical) {
+                    resultsDiv.innerHTML = `<h2>No data found for "${searchInput}".</h2>`;
+                }
+
+                resultsDiv.style.display = 'block'; // Show the results
+            }
+        }
+    </script>
+</body>
+</html>
